@@ -21,8 +21,8 @@
 </head>
 <body>
 <ol class="breadcrumb">
-    <li><a href="index.php">Home</a></li>
-    <li><a href="admin.php">Admin</a></li>
+    <li><a href="/">Home</a></li>
+    <li><a href="/adm/product">Product</a></li>
     <li class="active">Cat</li>
 </ol>
 <div class="page-header">

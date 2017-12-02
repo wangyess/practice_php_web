@@ -76,9 +76,9 @@ class Product
 
     public function read($rows)
     {
-        if (!he_is('admin')) {
-            return ['success' => false, 'msg' => 'quanxianbugou'];
-        }
+//        if (!he_is('admin')) {
+//            return ['success' => false, 'msg' => 'quanxianbugou'];
+//        }
 
         $page = (int)@$_GET['page'] ?: 1;
         $limit = 5;

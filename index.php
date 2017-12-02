@@ -1,5 +1,5 @@
 <?php
-require_once ('helper/helper.php');
+require_once('helper/helper.php');
 $uri = $_SERVER['REQUEST_URI'];
 
 switch ($uri) {
@@ -11,6 +11,15 @@ switch ($uri) {
         break;
     case '/adm/cat':
         tpl('cat');
+        break;
+    case '/login':
+        tpl('login');
+        break;
+    case '/signup':
+        tpl('signup');
+        break;
+    case '/logout':
+        tpl('logout');
         break;
     default:
         http_response_code(404);
