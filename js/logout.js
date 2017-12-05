@@ -8,7 +8,7 @@
 
         cli_on_1.addEventListener('click', function (e) {
             e.preventDefault();
-            $.post('admin/gateway.php?model=user&action=logout')
+            $.post('/a/user/logout')
                 .then(function (r) {
                     if (r.success) {
                         aa();

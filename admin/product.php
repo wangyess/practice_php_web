@@ -1,9 +1,11 @@
 <?php
 session_start();
+require_once('Model.php');
 
-class Product
+class Product extends Model
 {
     public $pdo;
+    public $table = 'product';
 
     public function __construct($pdo)
     {
@@ -12,10 +14,6 @@ class Product
 
     function add($rows)
     {
-        if (!he_is('admin')) {
-            return ['success' => false, 'msg' => 'quanxianbugou'];
-        }
-
         $title = @$rows['title'];
         $price = @$rows['price'];
         $cat_id = @$rows['cat_id'];
@@ -38,26 +36,12 @@ class Product
 
     public function remove($rows)
     {
-        if (!he_is('admin')) {
-            return ['success' => false, 'msg' => 'quanxianbugou'];
-        }
-
-        $id = $rows['id'];
-        if (!$id) {
-            return ['success' => false, 'msg' => 'interval:id'];
-        }
-        $sql = "delete from product where id=:id";
-        $sta = $this->pdo->prepare($sql);
-        $r = $sta->execute(['id' => $id]);
-        return $r ? ['success' => true] : ['success' => false, 'msg' => 'interval_error'];
+        $data = $this->_remove($rows);
+        return $data ? ['success' => false, 'msg' => 'interval_error'] : ['success' => true];
     }
 
     public function update($rows)
     {
-        if (!he_is('admin')) {
-            return ['success' => false, 'msg' => 'quanxianbugou'];
-        }
-
         $id = $rows['id'];
         if (!$id) {
             return ['success' => false, 'msg' => 'interval:id'];
@@ -68,7 +52,7 @@ class Product
             return ['success' => false, 'msg' => 'no_find'];
         }
         $a = array_merge($old, $rows);
-        $sql = "update product set title= :title, price= :price,cat_id= :cat_id,des= :des,count_s= :count_s where id=:id";
+        $sql = "update product set title= :title, price= :price,cat_id= :cat_id,des= :des,count_s= :count_s,hot= :hot,new= :new where id=:id";
         $sta = $this->pdo->prepare($sql);
         $r = $sta->execute($a);
         return ['success' => true, 'data' => $r];
@@ -76,36 +60,10 @@ class Product
 
     public function read($rows)
     {
-//        if (!he_is('admin')) {
-//            return ['success' => false, 'msg' => 'quanxianbugou'];
-//        }
-
-        $page = (int)@$_GET['page'] ?: 1;
-        $limit = 5;
-        $offset = $limit * ($page - 1);
-        $id = $rows['id'];
-        if ($id) {
-            $sql = "select * from product where id=:id";
-            $sta = $this->pdo->prepare($sql);
-            $sta->execute(['id' => $id]);
-            $r = $sta->fetch(PDO::FETCH_ASSOC);
-            if ($r) {
-                return ['success' => true, 'data' => $r];
-            } else {
-                return ['success' => false, 'msg' => 'error'];
-            }
-        } else {
-            $sql = "select * from product  order by id desc limit :offset, :limit";
-            $sta = $this->pdo->prepare($sql);
-            $sta->execute(['offset' => $offset, 'limit' => $limit]);
-            $r = $sta->fetchALL(PDO::FETCH_ASSOC);
-            if ($r) {
-                return ['success' => true, 'data' => $r];
-            } else {
-                return ['success' => false, 'msg' => 'error'];
-            }
-        }
+        $data = $this->_read($rows);
+        return ['success' => true, 'data' => $data];
     }
+
 
     public function read_count()
     {

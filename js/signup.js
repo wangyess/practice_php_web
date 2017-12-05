@@ -13,7 +13,7 @@
             e.preventDefault();
             //获取页面输入
             var data = get_page_input(signup_form);
-            $.post('/admin/gateway.php?model=user&action=signup', data)
+            $.post('/a/user/signup', data)
                 .then(function (r) {
                     if (r.success) {
                         alert('您已经成功注册');

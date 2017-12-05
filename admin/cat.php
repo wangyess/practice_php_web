@@ -1,9 +1,11 @@
 <?php
 session_start();
+require_once('Model.php');
 
-class Cat
+class Cat extends Model
 {
     public $pdo;
+    public $table = 'cat';
 
     public function __construct($pdo)
     {
@@ -12,11 +14,8 @@ class Cat
 
     public function add($rows)
     {
-        if (!he_is('admin')) {
-            return ['success' => false, 'msg' => 'quanxianbugou'];
-        }
-
         $title = $rows['title'];
+
         //判断是否传title
         if (!$title) {
             return ['success' => false, 'msg' => 'invalid:title'];
@@ -35,27 +34,12 @@ class Cat
 
     public function remove($rows)
     {
-        if (!he_is('admin')) {
-            return ['success' => false, 'msg' => 'quanxianbugou'];
-        }
-
-        $id = $rows['id'];
-        if (!$id) {
-            return ['success' => false, 'msg' => 'invalid:id'];
-        }
-        $sql = "delete from cat where id = ?";
-        $row = $this->pdo->prepare($sql);
-        $row->bindValue(1, $id);
-        $r = $row->execute();
-        return $r ? ['success' => true] : ['success' => false, 'msg' => 'internal_error'];
+        $data = $this->_remove($rows);
+        return $data ? ['success' => false, 'msg' => 'internal_error'] : ['success' => true];
     }
 
     public function update($rows)
     {
-        if (!he_is('admin')) {
-            return ['success' => false, 'msg' => 'quanxianbugou'];
-        }
-
         $id = $rows['id'];
         $title = $rows['title'];
         //判断是否传入了ID
@@ -80,25 +64,8 @@ class Cat
 
     public function read($rows)
     {
-        $id = $rows['id'];
-        $page = $_GET['page'] ?: 1;
-        $limit = 5;
-        $offset = $limit * ($page - 1);
-
-        if ($id) {
-            $s = $this->pdo->prepare('select * from cat where id = :id');
-            $s->execute(['id' => $id]);
-            $d = $s->fetch(PDO::FETCH_ASSOC);
-        } else {
-            $spl = "select * from cat order by id desc limit :offset, :limit";
-            $row = $this->pdo->prepare($spl);
-            $row->execute([
-                'offset' => $offset,
-                'limit' => $limit,
-            ]);
-            $d = $row->fetchAll(PDO::FETCH_ASSOC);
-        }
-        return ['success' => true, 'data' => $d];
+        $data = $this->_read($rows);
+        return ['success' => true, 'data' => $data];
     }
 
     public function read_count()

@@ -2,8 +2,8 @@
     'use strict';
     var page = 1;
     var number;
-    var product = new Model('Product');
-    var cat = new Model('Cat');
+    var product = new Model('product');
+    var cat = new Model('cat');
     var my_form = document.querySelector('#my-form');
     var my_tbody = document.querySelector('#first-tbody');
     var cat_select = document.querySelector('[name=cat_id]');
@@ -16,25 +16,27 @@
             return;
         }
         page--;
-        product.read(page, product_render_all);
+        product.read({'page' : page}, product_render_all);
     });
     next_page.addEventListener('click', function (e) {
         e.preventDefault();
+        console.log(number);
         if (page == number) {
             return;
         }
         page++;
-        product.read(page, product_render_all);
+        product.read({'page':page, 'order' :{'by' : 'id'}}, product_render_all);
 
     });
-
+    get_count();
     //获取当前页数
     function get_count() {
         product.read_count(render_count);
     }
 
     function render_count(n) {
-        number = Math.ceil(n / 5);
+        console.log(n);
+        number = Math.ceil(n / 10);
     }
 
     //增加
@@ -45,7 +47,7 @@
         var data = get_form_input();
         product.add_or_update(data);
         get_count();
-        product.read(page, product_render_all);
+        product.read({'page' : page , 'order':{'by':'id'} }, product_render_all);
     });
 
     //获取表中的数据
@@ -63,7 +65,7 @@
     }
 
     //获取到所有分类数据
-    cat.read(page, cat_render_all);
+    cat.read({'page':1}, cat_render_all);
 
     function cat_render_all(list) {
         cat_select.innerHTML = "";
@@ -80,9 +82,9 @@
     function del_event(a, id) {
         a.addEventListener('click', function (e) {
             e.preventDefault();
-            product.remove(id);
+            product.remove({'id' : id});
             get_count();
-            product.read(page, product_render_all);
+            product.read({page:1}, product_render_all);
         })
     }
 
@@ -107,7 +109,7 @@
     }
 
     //read
-    product.read(page, product_render_all);
+    product.read({'page':1, 'order' :{'by' : 'id'}}, product_render_all);
 
     function product_render_all(list) {
         my_tbody.innerHTML = "";
@@ -122,6 +124,10 @@
               <td>${item.count_s}</td>  
               <td>${item.des}</td>  
               <td>
+                 ${select(item.hot,'hot')}
+                 ${select(item.new,'new')}
+              </td>
+              <td>
                  <button class="btn btn-danger" id="del_button_${item.id}"><i class="fa fa-trash"></i></button>
                  <button class="btn btn-success" id="up_button_${item.id}"><i class="fa fa-edit"></i></button>
               </td>  
@@ -131,6 +137,28 @@
             del_event(del_button, item.id);
             var up_button = document.querySelector('#up_button_' + item.id);
             up_event(up_button, item);
+            //选中设置热卖或新品
+            let hot =tr.querySelector('[name=hot]');
+            let newSelect =tr.querySelector('[name=new]');
+            hot.value = item.hot;
+            newSelect.value = item.new;
+            set_event(hot,item.id);
+            set_event(newSelect,item.id);
         }
     }
+    function set_event(el,id){
+        el.addEventListener('change',function () {
+            var k=el.value;
+            var data ={'id':id};
+            data[el.name]= Number(k);
+            product.add_or_update(data);
+        })
+    }
+    function select(val,name){
+        return `<select name="${name}" value="${val}">
+                    <option value="0">否</option>
+                    <option value="1">是</option>
+                </select>`;
+    }
+
 })();

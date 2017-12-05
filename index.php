@@ -1,7 +1,11 @@
 <?php
 require_once('helper/helper.php');
+require_once('admin/gateway.php');
 $uri = $_SERVER['REQUEST_URI'];
-
+if (strpos($uri, '/a/') !== false) {
+    echo get_page_input($uri);
+    return;
+}
 switch ($uri) {
     case '/':
         tpl('home');

@@ -84,6 +84,7 @@
                     <th>Cat_id</th>
                     <th>Count_s</th>
                     <th>Des</th>
+                    <th>Hot_New</th>
                     <th>Operation</th>
                 </tr>
                 <tbody id="first-tbody">

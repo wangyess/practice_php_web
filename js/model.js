@@ -18,24 +18,25 @@
 
     function add_or_update(row) {
         if (row.id) {
-            return $.post('/admin/gateway.php?model=' + this.model_name + '&action=update', row)
+            return $.post('/a/' + this.model_name + '/update', row)
         } else {
-            return $.post('/admin/gateway.php?model=' + this.model_name + '&action=add', row)
+            console.log(row);
+            return $.post('/a/' + this.model_name + '/add', row)
         }
     }
 
-    function remove(id) {
+    function remove(data) {
         var ok = confirm('确定要删除吗?');
         if (!ok) {
             return;
         } else {
-            $.post('/admin/gateway.php?model=' + this.model_name + '&action=remove&id=' + id)
+            $.post('/a/' + this.model_name + '/remove', data)
         }
     }
 
-    function read(page, callback) {
+    function read(data, callback) {
         var me = this;
-        return $.get('/admin/gateway.php?model=' + this.model_name + '&action=read&page=' + (page || 1))
+        $.post('/a/' + this.model_name + '/read', data)
             .then(function (r) {
                 me.list = r.data;
                 callback && callback(me.list);
@@ -43,7 +44,7 @@
     }
 
     function read_count(callback) {
-        $.get('/admin/gateway.php?model=' + this.model_name + '&action=read_count', function (res) {
+        $.get('/a/' + this.model_name + '/read_count', function (res) {
             callback && callback(res);
         })
     }

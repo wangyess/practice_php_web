@@ -14,16 +14,17 @@
 //定义一个页数数量
     var page_count;
 //实例化一个cat分类
-    var cat = new Model('Cat');
+    var cat = new Model('cat');
 //首先获取到cat数据把select填充
     init();
 
     function init() {
-        cat.read(page, render_cat_select);
-        cat.read(page, render_cat_tbody);
+        cat.read({'page' : 1}, render_cat_select);
+        cat.read({'page' : 1}, render_cat_tbody);
         form_submit();
         cat.read_count(get_page_count);
     }
+
 //渲染select中的各个选项
     function render_cat_select(list) {
         cat_select.innerHTML = "";
@@ -72,14 +73,12 @@
             //添加
             cat.add_or_update(data)
                 .then(function (r) {
-                    if (!r.success) {
-                        alert(r.msg);
+                    if (r.success) {
+                        cat.read({'page':1, 'order' :{'by' : 'id'}}, render_cat_select);
+                        cat.read_count(get_page_count);
+                        cat.read({'page':1, 'order' :{'by' : 'id'}}, render_cat_tbody);
                     }
                 });
-            //刷新翻页
-            cat.read_count(get_page_count);
-            //重新加载页面
-            init();
         });
     }
 
@@ -102,7 +101,8 @@
     function del_event(a, id) {
         a.addEventListener('click', function (e) {
             e.preventDefault();
-            cat.remove(id);
+            cat.remove({'id' : id});
+            cat.read({'page' : page}, render_cat_select);
             //刷新翻页
             cat.read_count(get_page_count);
             //删除之后还需要重新加载页面  保持更新
@@ -115,6 +115,7 @@
         a.addEventListener('click', function (e) {
             e.preventDefault();
             //更新 首先要把要更新的数据传到表单中
+            cat.read({'page' : page}, render_cat_select);
             set_form_data(data);
         })
     }
@@ -134,22 +135,24 @@
     //首先获取到一共有几页
 
     function get_page_count(n) {
-        page_count=Math.ceil(n/5);
+        console.log(n);
+        page_count = Math.ceil(n / 10);
     }
-    next_page.addEventListener('click',function (e) {
+
+    next_page.addEventListener('click', function (e) {
         e.preventDefault();
-        if(page>=page_count){
-           return;
+        if (page == page_count) {
+            return;
         }
         page++;
-        cat.read(page,render_cat_tbody);
+        cat.read({'page' : page}, render_cat_tbody);
     });
-    top_page.addEventListener('click',function (e) {
+    top_page.addEventListener('click', function (e) {
         e.preventDefault();
-        if(page<=1){
+        if (page <= 1) {
             return
         }
         page--;
-        cat.read(page,render_cat_tbody);
+        cat.read({'page' : page} , render_cat_tbody);
     })
 })();

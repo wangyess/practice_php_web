@@ -1,46 +1,78 @@
 <?php
 session_start();
-require_once ('../helper/helper.php');
-require_once('./cat.php');
-require_once('./product.php');
-require_once('./user.php');
-require_once('./order.php');
-//封装一个连接数据库的方法
-function connect_database()
-{
-    //配置默认项
-    $options = [
-        /* 常用设置 */
-        PDO::ATTR_CASE => PDO::CASE_NATURAL, /*PDO::CASE_NATURAL | PDO::CASE_LOWER 小写，PDO::CASE_UPPER 大写， */
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, /*是否报错，PDO::ERRMODE_SILENT 只设置错误码，PDO::ERRMODE_WARNING 警告级，如果出错提示警告并继续执行| PDO::ERRMODE_EXCEPTION 异常级，如果出错提示异常并停止执行*/
-        PDO::ATTR_ORACLE_NULLS => PDO::NULL_NATURAL, /* 空值的转换策略 */
-        PDO::ATTR_STRINGIFY_FETCHES => false, /* 将数字转换为字符串 */
-        PDO::ATTR_EMULATE_PREPARES => false, /* 模拟语句准备 */
-    ];
-    return $pdo = new PDO('mysql:host=wangye.mvp;dbname=shopping_mall', 'root', 'wangye', $options);
-}
+require_once(dirname(__FILE__) . '/../helper/helper.php');
+require_once(dirname(__FILE__) . '/./cat.php');
+require_once(dirname(__FILE__) . '/./product.php');
+require_once(dirname(__FILE__) . '/./user.php');
+require_once(dirname(__FILE__) . '/./order.php');
 
 //获取页面的输入
-function get_page_input($pdo)
+function get_page_input($uri)
 {
+    $uri = trim(trim($uri, '/'), 'a/');
+    $model_action = explode('/', $uri);
+    $model = @$model_action[0];
+    $action = @$model_action[1];
+    $pdo = connect_database();
+
     //获取输入
     $params = array_merge($_GET, $_POST);
     //获取页面调用的类名
-    $klass = ucfirst(@$params['model']);
+    $klass = ucfirst($model);
     //获取页面调用的方法
-    $methods = @$params['action'];
+    $methods = $action;
+    //判断权限
+   if(! has_permission_to($model,$action)){
+      echo json_encode(['success' => false, 'msg' => 'permission_denied']);
+      return;
+   }
     $kk = new $klass($pdo);
-    unset($params['model']);
-    unset($params['action']);
     //调用这个方法
-    return $kk->$methods($params);
+    $res=$kk->$methods($params);
+    echo json($res);
 }
 
-//初始函数
-function init()
+function has_permission_to($model, $action)
 {
-    $pdo = connect_database();
-    echo json(get_page_input($pdo));
+   $public = [
+     'user' => ['login','signup' , 'logout']
+   ];
+    $config = [
+        'product' => [
+            'read' => ['user', 'admin'],
+            'add' => ['admin'],
+            'remove' => ['admin'],
+            'update' => ['admin'],
+            'read_count' => ['user' ,'admin'],
+        ],
+        'cat' => [
+            'read' => ['user', 'admin'],
+            'add' => ['admin'],
+            'remove' => ['admin'],
+            'update' => ['admin'],
+            'read_count' => ['user' ,'admin'],
+        ]
+    ];
+    //判断是否有传进来的model
+    if(! key_exists($model,$config) && !key_exists($model,$public)){
+       return false;
+    }
+    $public_action_arr=@$public[$model];
+    if( $public_action_arr && in_array($action,$public_action_arr)){
+        return true;
+    }
+    //判断是否有传进来的方法
+    $action_arr=$config[$model];
+    if(! key_exists($action,$action_arr)){
+       return false;
+    }
+    //判断你是否有权限去访问这个方法
+    $permission_arr=$action_arr[$action];
+    $user_permission=$_SESSION['user']['permission'];
+    if( ! in_array($user_permission,$permission_arr)){
+        return false;
+    }else{
+        return true;
+    }
 }
 
-init();

@@ -14,7 +14,7 @@
             e.preventDefault();
             //获取页面输入
             var data = get_page_input(login_form);
-            $.post('/admin/gateway.php?model=user&action=login',data)
+            $.post('/a/user/login',data)
                 .then(function (r) {
                    if(r.success){
                        alert('您已经登陆成功');
