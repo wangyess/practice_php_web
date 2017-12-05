@@ -20,7 +20,6 @@
         if (row.id) {
             return $.post('/a/' + this.model_name + '/update', row)
         } else {
-            console.log(row);
             return $.post('/a/' + this.model_name + '/add', row)
         }
     }
