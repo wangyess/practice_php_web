@@ -16,7 +16,7 @@
             return;
         }
         page--;
-        product.read({'page' : page}, product_render_all);
+        product.read({'page' : page,'order':{'by' : 'id'}}, product_render_all);
     });
     next_page.addEventListener('click', function (e) {
         e.preventDefault();
