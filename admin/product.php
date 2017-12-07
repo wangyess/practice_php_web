@@ -32,8 +32,12 @@ class Product extends Model
 
     public function read($rows)
     {
-        $data = $this->_read($rows);
-        return ['success' => true, 'data' => $data];
+        $r=$this->test();
+        if($r['success']){
+            $data = $this->_read($rows);
+            return ['success' => true, 'data' => $data];
+        }
+        return ['success' => false, 'msg' => $r['msg']];
     }
     public function read_count()
     {

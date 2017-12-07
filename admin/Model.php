@@ -1,7 +1,16 @@
 <?php
-
-class Model
+require_once(dirname(__FILE__) . '/Validation.php');
+class Model extends Validation
 {
+    public $column_rule;
+    public function test(){
+       $rules = $this->rule_arr('max_length:10 |min_length:4');
+       $r= $this-> validation_rule('wangye', $rules,$error);
+       if(!$r){
+           return ['success' => false , 'msg' => $error];
+       }
+       return ['success' => true];
+    }
     function _read($opt = [])
     {
         $id = @$opt['id'];

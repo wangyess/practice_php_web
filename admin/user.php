@@ -1,9 +1,15 @@
 <?php
 session_start();
+require_once('Model.php');
 
-class User
+class User extends Model
 {
     public $pdo;
+
+//    public $column_rule = [
+//        'username' => 'max_length:12 | min_length:4',
+//        'password' => 'max_length:64 | min_length:12',
+//    ];
 
     public function __construct($pdo)
     {
