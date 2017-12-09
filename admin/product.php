@@ -7,6 +7,12 @@ class Product extends Model
     public $pdo;
     public $table = 'product';
 
+    public $column_rule = [
+        'title'   => 'u_max_length:24|u_min_length:3',
+        'price'   => 'numeric|positive',
+        'count_s' => 'integer|positive',
+    ];
+
     public function __construct($pdo)
     {
         $this->pdo = $pdo;
@@ -14,8 +20,8 @@ class Product extends Model
 
     function add($rows)
     {
-        $data=$this->_add($rows);
-        return $data ? ['success' => true] : ['success' => false, 'msg' => 'interval_error'];
+        $data = $this->_add($rows);
+        return $data['success'] ? ['success' => true] : $data;
     }
 
     public function remove($rows)
@@ -26,19 +32,21 @@ class Product extends Model
 
     public function update($rows)
     {
-        $data=$this->_update($rows);
-        return $data ?['success' => true] :['success' => false];
+        $data = $this->_update($rows);
+        $rs = $data['msg'];
+        if ($rs) {
+            return $data;
+        }
+        return $data ? ['success' => true] : ['success' => false];
     }
 
     public function read($rows)
     {
-        $r=$this->test();
-        if($r['success']){
-            $data = $this->_read($rows);
-            return ['success' => true, 'data' => $data];
-        }
-        return ['success' => false, 'msg' => $r['msg']];
+        $data = $this->_read($rows);
+        return ['success' => true, 'data' => $data];
+
     }
+
     public function read_count()
     {
         $sql = "select count(*) from product ";

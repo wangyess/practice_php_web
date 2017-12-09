@@ -1,16 +1,26 @@
 <?php
 require_once(dirname(__FILE__) . '/Validation.php');
+
 class Model extends Validation
 {
     public $column_rule;
-    public function test(){
-       $rules = $this->rule_arr('max_length:10 |min_length:4');
-       $r= $this-> validation_rule('wangye', $rules,$error);
-       if(!$r){
-           return ['success' => false , 'msg' => $error];
-       }
-       return ['success' => true];
+
+    //遍历规则
+    public function each_rule($opt)
+    {
+        foreach ($this->column_rule as $key => $val) {
+            $user_val = $opt[ $key ];
+            if (!$user_val) {
+                continue;
+            }
+            $r = $this->validation_rule($user_val, $val, $error);
+            if (!$r) {
+                return ['success' => false, 'msg' => $error];
+            }
+        }
+        return ['success' => true];
     }
+
     function _read($opt = [])
     {
         $id = @$opt['id'];
@@ -67,13 +77,19 @@ class Model extends Validation
         return $this->_add_or_update('add', $opt);
     }
 
-    public function _update($opt = [])
+    public
+    function _update($opt = [])
     {
         return $this->_add_or_update('update', $opt);
     }
 
-    public function _add_or_update($type, $opt)
+    public
+    function _add_or_update($type, $opt)
     {
+        $r = $this->each_rule($opt);
+        if (!$r['success']) {
+            return $r;
+        }
         //判断是添加还是更新
         $is_add = $type == 'add';
         if ($is_add) {
@@ -95,7 +111,8 @@ class Model extends Validation
         return $sta->execute();
     }
 
-    public function create_add_sql($opt)
+    public
+    function create_add_sql($opt)
     {
         $sql_key = '';
         $sql_val = '';
@@ -113,7 +130,8 @@ class Model extends Validation
         return $sql = "insert into $this->table ($sql_key) VALUES ($sql_val)";
     }
 
-    public function create_update_sql($opt)
+    public
+    function create_update_sql($opt)
     {
         $id = $opt['id'];
         $col = '';
@@ -121,7 +139,7 @@ class Model extends Validation
         foreach ($opt as $key => $val) {
             if (in_array($key, $all_name)) {
                 if ($key == 'id') continue;
-                if ($opt[$key] == '') continue;
+                if ($opt[ $key ] == '') continue;
                 $col .= " $key = '$val', ";
             } else {
                 continue;
@@ -131,7 +149,8 @@ class Model extends Validation
         return $sql = "update $this->table set $col  where id = $id ";
     }
 
-    public function column_list()
+    public
+    function column_list()
     {
         $sql = "desc $this->table";
         $sta = $this->pdo->prepare($sql);
@@ -139,7 +158,8 @@ class Model extends Validation
         return $sta->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function column_name_list()
+    public
+    function column_name_list()
     {
         $name_list = [];
         $list = $this->column_list();
@@ -150,7 +170,8 @@ class Model extends Validation
     }
 
     /*通过id找一行*/
-    public function find($id)
+    public
+    function find($id)
     {
         if (!$id) return false;
 

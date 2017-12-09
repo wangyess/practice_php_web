@@ -6,6 +6,10 @@ class Cat extends Model
 {
     public $pdo;
     public $table = 'cat';
+    public $column_rule = [
+        'title'     => 'u_max_length:12|u_min_length:2',
+        'parent_id' => 'numeric|positive',
+    ];
 
     public function __construct($pdo)
     {
@@ -24,8 +28,12 @@ class Cat extends Model
             return ['success' => false, 'msg' => 'exist:title'];
         }
         //如果有parent_id 那么返回一个int型的 如果没有自动为空
-        $rows['parent_id'] = $rows['parent_id'] ? (int)$rows['parent_id'] : 1;
+        $rows['parent_id'] = $rows['parent_id'] ? $rows['parent_id'] : 1;
         $data = $this->_add($rows);
+        $rs = $data['msg'];
+        if ($rs) {
+            return $data;
+        }
         return $data ? ['success' => true] : ['success' => false, 'msg' => 'internal_error'];
     }
 
@@ -43,6 +51,10 @@ class Cat extends Model
             return ['success' => false, 'msg' => 'exist:title'];
         }
         $data = $this->_update($rows);
+        $rs = $data['msg'];
+        if ($rs) {
+            return $data;
+        }
         return $data ? ['success' => true] : ['success' => false, 'msg' => 'internal_error'];
     }
 

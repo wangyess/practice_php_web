@@ -7,6 +7,11 @@ class Package extends Model
     public $pdo;
     public $table = 'package';
 
+    public $column_rule = [
+        'name'  => 'u_max_length:12|u_min_length:3',
+        'price' => 'numeric|positive',
+    ];
+
     public function __construct($pdo)
     {
         $this->pdo = $pdo;
@@ -19,6 +24,10 @@ class Package extends Model
             return ['success' => false, 'msg' => 'invalid:product_id'];
         }
         $data = $this->_add($rows);
+        $rs = $data['msg'];
+        if ($rs) {
+            return $data;
+        }
         return $data ?
             ['success' => true] :
             ['success' => false, 'msg' => 'internal_error'];
@@ -33,7 +42,7 @@ class Package extends Model
     public function update($rows)
     {
         $id = @$rows['id'];
-        if(!$id){
+        if (!$id) {
             return ['success' => false, 'msg' => 'no_id'];
         }
         $name = @$rows['name'];
@@ -43,6 +52,10 @@ class Package extends Model
             return ['success' => false, 'msg' => 'exist_name'];
         }
         $data = $this->_update($rows);
+        $rs = $data['msg'];
+        if ($rs) {
+            return $data;
+        }
         return $data ? ['success' => true] : ['success' => false, 'msg' => 'internal_error'];
     }
 

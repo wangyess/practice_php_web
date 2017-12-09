@@ -6,10 +6,10 @@ class User extends Model
 {
     public $pdo;
 
-//    public $column_rule = [
-//        'username' => 'max_length:12 | min_length:4',
-//        'password' => 'max_length:64 | min_length:12',
-//    ];
+    public $column_rule = [
+        'username' => 'u_max_length:12|u_min_length:4',
+        'password' => 'p_max_length:64|p_min_length:12',
+    ];
 
     public function __construct($pdo)
     {
