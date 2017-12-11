@@ -168,7 +168,9 @@ class Model extends Validation
         }
         return $name_list;
     }
+    public function show_your_product(){
 
+    }
     /*通过id找一行*/
     public
     function find($id)

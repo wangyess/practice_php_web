@@ -55,6 +55,27 @@ class Product extends Model
         return $sta->fetch(PDO::FETCH_NUM)[0];
     }
 
+    public function buy($rows)
+    {
+        $pid = @$rows['product_id'];
+        $uid = @$_SESSION['user']['id'];
+        $sql = "insert into user_product_buy(product_id,user_id) VALUES ($pid ,$uid)";
+        $sta = $this->pdo->prepare($sql);
+        $r = $sta->execute();
+        return $r ? ['success' => true] : ['success' => false, 'msg' => 'internal_error'];
+    }
+
+    public function your_product()
+    {
+        $uid = @$_SESSION['user']['id'];
+        $data = $this->show_your_product([
+            ['product.title', 'product.price'],
+            'user_product_buy',
+            ['user_id' => $uid],
+        ]);
+        return $data ?['success' => true] : ['success' =>false ,'msg' => 'no'];
+    }
+
     public function exist_product($id)
     {
         $sql = "select * from product where id=:id";

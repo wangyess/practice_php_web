@@ -5,6 +5,7 @@ require_once(dirname(__FILE__) . '/./cat.php');
 require_once(dirname(__FILE__) . '/./product.php');
 require_once(dirname(__FILE__) . '/./user.php');
 require_once(dirname(__FILE__) . '/./order.php');
+require_once(dirname(__FILE__) . '/./user_product_buy.php');
 require_once(dirname(__FILE__) . '/./package.php');
 
 //获取页面的输入
@@ -48,6 +49,7 @@ function has_permission_to($model, $action)
             'remove' => ['admin'],
             'update' => ['admin'],
             'read_count' => ['user', 'admin'],
+            'buy' => ['user' ,'admin'],
         ],
         'cat' => [
             'read' => ['user', 'admin'],
@@ -61,6 +63,10 @@ function has_permission_to($model, $action)
             'add' => ['admin'],
             'remove' => ['admin'],
             'update' => ['admin'],
+        ],
+        'user_buy' =>[
+            'add' => ['user' , 'admin'],
+            'read' => ['user' , 'admin'],
         ]
     ];
     //判断是否有传进来的model
